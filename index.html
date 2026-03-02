@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASCII ART Конвертер</title>
+  <style>
+    :root {
+      --bg: #050805;
+      --panel: #0b1f14;
+      --panel-2: #000000;
+      --accent: #8effb7;
+      --text: #d8ffe7;
+      --shadow: #030a07;
+      --danger: #ff7e7e;
+      --ascii-color: #8effb7;
+    }
+
+    * { box-sizing: border-box; border-radius: 0 !important; }
+
+    body {
+      margin: 0;
+      font-family: "IBM Plex Mono", "Fira Code", monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 18px;
+    }
+
+    .site-title {
+      grid-column: 1 / -1;
+      border: 3px solid var(--accent);
+      background: #000;
+      box-shadow: 8px 8px 0 var(--shadow);
+      padding: 14px 16px;
+    }
+
+    .site-title strong {
+      display: block;
+      font-size: 28px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .site-title span {
+      font-size: 12px;
+      opacity: .9;
+      text-transform: uppercase;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 3px solid var(--accent);
+      box-shadow: 8px 8px 0 var(--shadow);
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      text-transform: uppercase;
+      font-size: 24px;
+      letter-spacing: 0.02em;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .field, textarea, select, input[type="color"], input[type="file"], button {
+      width: 100%;
+      border: 2px solid var(--accent);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 10px;
+      font: inherit;
+      outline: none;
+    }
+
+    textarea { min-height: 160px; resize: vertical; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+      transition: transform .07s ease;
+    }
+
+    button:hover { transform: translate(-2px, -2px); }
+    button:active { transform: translate(1px, 1px); }
+
+    .warn { color: var(--danger); min-height: 20px; font-size: 13px; }
+
+    .output-wrap {
+      display: grid;
+      gap: 10px;
+    }
+
+    #asciiOutput {
+      margin: 0;
+      overflow: auto;
+      min-height: 720px;
+      max-height: 82vh;
+      padding: 16px;
+      border: 3px solid var(--accent);
+      background: #000;
+      box-shadow: inset 0 0 0 2px #000;
+      line-height: 1;
+      letter-spacing: 0;
+      white-space: pre;
+      font-size: 12px;
+      color: var(--ascii-color);
+    }
+
+    .help {
+      font-size: 12px;
+      opacity: .9;
+    }
+
+    .switch {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      border: 2px solid var(--accent);
+      padding: 8px;
+      background: var(--panel-2);
+    }
+
+    @media (max-width: 1020px) {
+      .container { grid-template-columns: 1fr; }
+      #asciiOutput { min-height: 500px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="site-title">
+      <strong>NEO ASCII LAB</strong>
+      <span>Конвертер текста и изображений в ASCIL / ASCII ART</span>
+    </header>
+
+    <section class="panel">
+      <h1>ASCII / ASCIL ART Конвертер</h1>
+      <div class="controls">
+        <div>
+          <label for="textInput">Текст для конвертации</label>
+          <textarea id="textInput" placeholder="Введи текст...">ASCII ART</textarea>
+        </div>
+
+        <div>
+          <label for="imageInput">Изображение (jpeg, png, webp)</label>
+          <input id="imageInput" type="file" accept="image/jpeg,image/png,image/webp" />
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="mode">Режим ASCII</label>
+            <select id="mode">
+              <option value="detailed">Детальный (все символы)</option>
+              <option value="standard" selected>Стандартный (10 символов)</option>
+              <option value="blocks">Блочный (из блоков)</option>
+              <option value="binary">Бинарный (0 и 1)</option>
+            </select>
+          </div>
+          <div>
+            <label for="asciiColor">Цвет ASCII</label>
+            <input id="asciiColor" type="color" value="#8effb7" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="width">Ширина в символах</label>
+            <input id="width" class="field" type="number" min="20" max="250" value="120" />
+          </div>
+          <div>
+            <label for="fontSize">Размер символов (px)</label>
+            <input id="fontSize" class="field" type="number" min="8" max="24" value="12" />
+          </div>
+        </div>
+
+        <label class="switch">
+          <input id="colorized" type="checkbox" />
+          Цветной ASCII-ART (цвет каждого символа как у картинки)
+        </label>
+
+        <div class="btns">
+          <button id="renderTextBtn" type="button">Сделать из текста</button>
+          <button id="renderImageBtn" type="button">Сделать из картинки</button>
+        </div>
+        <button id="downloadBtn" type="button">Скачать результат (.txt)</button>
+        <div class="warn" id="warning"></div>
+        <div class="help">Для цветного режима вывод генерируется через HTML-спаны, для монохромного — обычный текст.</div>
+      </div>
+    </section>
+
+    <section class="panel output-wrap">
+      <label>Результат</label>
+      <pre id="asciiOutput"></pre>
+    </section>
+  </main>
+
+  <script>
+    const ramps = {
+      detailed: " .'`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$",
+      standard: "@%#*+=-:. ",
+      blocks: "█▓▒░ ",
+      binary: "10"
+    };
+
+    const textInput = document.getElementById('textInput');
+    const imageInput = document.getElementById('imageInput');
+    const modeSelect = document.getElementById('mode');
+    const asciiColorInput = document.getElementById('asciiColor');
+    const widthInput = document.getElementById('width');
+    const fontSizeInput = document.getElementById('fontSize');
+    const colorizedCheckbox = document.getElementById('colorized');
+    const output = document.getElementById('asciiOutput');
+    const warning = document.getElementById('warning');
+
+    document.getElementById('renderTextBtn').addEventListener('click', renderFromText);
+    document.getElementById('renderImageBtn').addEventListener('click', renderFromImage);
+    document.getElementById('downloadBtn').addEventListener('click', downloadAscii);
+    asciiColorInput.addEventListener('input', () => {
+      output.style.color = asciiColorInput.value;
+      document.documentElement.style.setProperty('--ascii-color', asciiColorInput.value);
+    });
+    fontSizeInput.addEventListener('input', () => {
+      output.style.fontSize = `${Math.max(8, Number(fontSizeInput.value) || 12)}px`;
+    });
+
+    output.style.color = asciiColorInput.value;
+
+    function setWarn(msg = '') { warning.textContent = msg; }
+
+    function mapBrightnessToChar(brightness, ramp) {
+      const i = Math.floor((brightness / 255) * (ramp.length - 1));
+      return ramp[ramp.length - 1 - i] || ' ';
+    }
+
+    function renderFromText() {
+      setWarn('');
+      const text = textInput.value.trim();
+      if (!text) {
+        setWarn('Введите текст для конвертации.');
+        return;
+      }
+      const ramp = ramps[modeSelect.value];
+      const targetWidth = Math.min(250, Math.max(20, Number(widthInput.value) || 120));
+      const lines = text.split('\n');
+      const longest = lines.reduce((max, line) => Math.max(max, line.length), 1);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const fontPx = Math.max(28, Math.round((targetWidth / Math.max(8, longest)) * 3.1));
+
+      ctx.font = `900 ${fontPx}px "IBM Plex Mono", monospace`;
+      const metrics = ctx.measureText('W');
+      const glyphWidth = Math.max(10, metrics.width);
+      const textWidth = Math.max(80, Math.ceil(longest * glyphWidth + 20));
+      const lineHeight = Math.ceil(fontPx * 1.2);
+      const textHeight = Math.max(lineHeight, lines.length * lineHeight + 20);
+
+      canvas.width = textWidth;
+      canvas.height = textHeight;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#fff';
+      ctx.font = `900 ${fontPx}px "IBM Plex Mono", monospace`;
+      ctx.textBaseline = 'top';
+
+      lines.forEach((line, idx) => {
+        ctx.fillText(line, 10, 10 + idx * lineHeight);
+      });
+
+      const sampleH = Math.max(10, Math.round((canvas.height / canvas.width) * targetWidth * 0.55));
+      const sampleCanvas = document.createElement('canvas');
+      const sampleCtx = sampleCanvas.getContext('2d');
+      sampleCanvas.width = targetWidth;
+      sampleCanvas.height = sampleH;
+      sampleCtx.drawImage(canvas, 0, 0, targetWidth, sampleH);
+
+      const { data } = sampleCtx.getImageData(0, 0, targetWidth, sampleH);
+      let ascii = '';
+      for (let y = 0; y < sampleH; y++) {
+        for (let x = 0; x < targetWidth; x++) {
+          const i = (y * targetWidth + x) * 4;
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          ascii += mapBrightnessToChar(brightness, ramp);
+        }
+        ascii += '\n';
+      }
+
+      output.textContent = ascii;
+      output.style.color = asciiColorInput.value;
+    }
+
+    async function renderFromImage() {
+      setWarn('');
+      const file = imageInput.files?.[0];
+      if (!file) {
+        setWarn('Выберите изображение в формате jpeg, png или webp.');
+        return;
+      }
+
+      const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowed.includes(file.type)) {
+        setWarn('Недопустимый тип файла. Поддерживаются только jpeg, png, webp.');
+        return;
+      }
+
+      const img = await loadImage(file);
+      const targetWidth = Math.min(250, Math.max(20, Number(widthInput.value) || 120));
+      const scale = img.height / img.width;
+      const targetHeight = Math.max(10, Math.round(targetWidth * scale * 0.55));
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+      const { data } = ctx.getImageData(0, 0, targetWidth, targetHeight);
+      const ramp = ramps[modeSelect.value];
+      const colorized = colorizedCheckbox.checked;
+
+      if (!colorized) {
+        let ascii = '';
+        for (let y = 0; y < targetHeight; y++) {
+          for (let x = 0; x < targetWidth; x++) {
+            const i = (y * targetWidth + x) * 4;
+            const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+            if (a < 40) {
+              ascii += ' ';
+              continue;
+            }
+            const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            ascii += mapBrightnessToChar(brightness, ramp);
+          }
+          ascii += '\n';
+        }
+        output.textContent = ascii;
+        output.style.color = asciiColorInput.value;
+      } else {
+        let html = '';
+        for (let y = 0; y < targetHeight; y++) {
+          for (let x = 0; x < targetWidth; x++) {
+            const i = (y * targetWidth + x) * 4;
+            const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+            const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            const char = a < 40 ? ' ' : mapBrightnessToChar(brightness, ramp);
+            html += `<span style="color: rgb(${r},${g},${b});">${escapeHtml(char)}</span>`;
+          }
+          html += '\n';
+        }
+        output.innerHTML = html;
+      }
+    }
+
+    function loadImage(file) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          resolve(img);
+        };
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    function escapeHtml(char) {
+      return char
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;')
+        .replaceAll(' ', '&nbsp;');
+    }
+
+    function downloadAscii() {
+      const content = output.innerText || '';
+      if (!content.trim()) {
+        setWarn('Сначала создайте ASCII-ART, затем скачивайте.');
+        return;
+      }
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ascii-art-${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    renderFromText();
+  </script>
+</body>
+</html>
