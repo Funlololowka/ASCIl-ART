@@ -6,9 +6,9 @@
   <title>ASCII ART Конвертер</title>
   <style>
     :root {
-      --bg: #0b1f14;
-      --panel: #123323;
-      --panel-2: #1d4a34;
+      --bg: #050805;
+      --panel: #0b1f14;
+      --panel-2: #000000;
       --accent: #8effb7;
       --text: #d8ffe7;
       --shadow: #030a07;
@@ -33,6 +33,27 @@
       display: grid;
       grid-template-columns: 380px 1fr;
       gap: 18px;
+    }
+
+    .site-title {
+      grid-column: 1 / -1;
+      border: 3px solid var(--accent);
+      background: #000;
+      box-shadow: 8px 8px 0 var(--shadow);
+      padding: 14px 16px;
+    }
+
+    .site-title strong {
+      display: block;
+      font-size: 28px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .site-title span {
+      font-size: 12px;
+      opacity: .9;
+      text-transform: uppercase;
     }
 
     .panel {
@@ -111,12 +132,12 @@
       max-height: 82vh;
       padding: 16px;
       border: 3px solid var(--accent);
-      background: #06130c;
+      background: #000;
       box-shadow: inset 0 0 0 2px #000;
       line-height: 1;
       letter-spacing: 0;
       white-space: pre;
-      font-size: 8px;
+      font-size: 12px;
       color: var(--ascii-color);
     }
 
@@ -143,6 +164,11 @@
 </head>
 <body>
   <main class="container">
+    <header class="site-title">
+      <strong>NEO ASCII LAB</strong>
+      <span>Конвертер текста и изображений в ASCIL / ASCII ART</span>
+    </header>
+
     <section class="panel">
       <h1>ASCII / ASCIL ART Конвертер</h1>
       <div class="controls">
@@ -179,7 +205,7 @@
           </div>
           <div>
             <label for="fontSize">Размер символов (px)</label>
-            <input id="fontSize" class="field" type="number" min="4" max="18" value="8" />
+            <input id="fontSize" class="field" type="number" min="8" max="24" value="12" />
           </div>
         </div>
 
@@ -230,7 +256,7 @@
       document.documentElement.style.setProperty('--ascii-color', asciiColorInput.value);
     });
     fontSizeInput.addEventListener('input', () => {
-      output.style.fontSize = `${Math.max(4, Number(fontSizeInput.value) || 8)}px`;
+      output.style.fontSize = `${Math.max(8, Number(fontSizeInput.value) || 12)}px`;
     });
 
     output.style.color = asciiColorInput.value;
@@ -250,18 +276,52 @@
         return;
       }
       const ramp = ramps[modeSelect.value];
+      const targetWidth = Math.min(250, Math.max(20, Number(widthInput.value) || 120));
       const lines = text.split('\n');
-      const converted = lines.map(line => {
-        const out = [];
-        for (const ch of line) {
-          const code = ch.charCodeAt(0);
-          const brightness = code % 256;
-          out.push(mapBrightnessToChar(brightness, ramp));
-        }
-        return out.join('');
-      }).join('\n');
+      const longest = lines.reduce((max, line) => Math.max(max, line.length), 1);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const fontPx = Math.max(28, Math.round((targetWidth / Math.max(8, longest)) * 3.1));
 
-      output.textContent = converted;
+      ctx.font = `900 ${fontPx}px "IBM Plex Mono", monospace`;
+      const metrics = ctx.measureText('W');
+      const glyphWidth = Math.max(10, metrics.width);
+      const textWidth = Math.max(80, Math.ceil(longest * glyphWidth + 20));
+      const lineHeight = Math.ceil(fontPx * 1.2);
+      const textHeight = Math.max(lineHeight, lines.length * lineHeight + 20);
+
+      canvas.width = textWidth;
+      canvas.height = textHeight;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#fff';
+      ctx.font = `900 ${fontPx}px "IBM Plex Mono", monospace`;
+      ctx.textBaseline = 'top';
+
+      lines.forEach((line, idx) => {
+        ctx.fillText(line, 10, 10 + idx * lineHeight);
+      });
+
+      const sampleH = Math.max(10, Math.round((canvas.height / canvas.width) * targetWidth * 0.55));
+      const sampleCanvas = document.createElement('canvas');
+      const sampleCtx = sampleCanvas.getContext('2d');
+      sampleCanvas.width = targetWidth;
+      sampleCanvas.height = sampleH;
+      sampleCtx.drawImage(canvas, 0, 0, targetWidth, sampleH);
+
+      const { data } = sampleCtx.getImageData(0, 0, targetWidth, sampleH);
+      let ascii = '';
+      for (let y = 0; y < sampleH; y++) {
+        for (let x = 0; x < targetWidth; x++) {
+          const i = (y * targetWidth + x) * 4;
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          ascii += mapBrightnessToChar(brightness, ramp);
+        }
+        ascii += '\n';
+      }
+
+      output.textContent = ascii;
       output.style.color = asciiColorInput.value;
     }
 
