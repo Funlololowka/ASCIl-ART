@@ -1,431 +1,744 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ASCII ART Конвертер</title>
+  <title>ASCIL-ART STUDIO</title>
   <style>
     :root {
-      --bg: #050805;
-      --panel: #0b1f14;
-      --panel-2: #000000;
-      --accent: #8effb7;
-      --text: #d8ffe7;
-      --shadow: #030a07;
-      --danger: #ff7e7e;
-      --ascii-color: #8effb7;
+      --bg: #060d08;
+      --bg2: #09170c;
+      --surface: #0d1e11;
+      --surface-2: #132a18;
+      --ink: #b8ff9b;
+      --ink-soft: #7cd96f;
+      --border: #2f7f3a;
+      --accent: #1f9e38;
+      --accent-2: #146a28;
+      --shadow: #041007;
+      --danger: #ff3f45;
     }
 
-    * { box-sizing: border-box; border-radius: 0 !important; }
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      scrollbar-width: thin;
+      scrollbar-color: #2d7f3b #071109;
+    }
+
+    *::-webkit-scrollbar {
+      width: 11px;
+      height: 11px;
+    }
+
+    *::-webkit-scrollbar-track {
+      background: #071109;
+      border-left: 2px solid #103019;
+      border-top: 2px solid #103019;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      background: #1f8634;
+      border: 2px solid #0c2012;
+    }
 
     body {
       margin: 0;
-      font-family: "IBM Plex Mono", "Fira Code", monospace;
-      background: var(--bg);
-      color: var(--text);
       min-height: 100vh;
+      font-family: "Courier New", "Lucida Console", monospace;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(34, 88, 48, 0.34), transparent 42%),
+        radial-gradient(circle at 85% 0%, rgba(27, 89, 41, 0.26), transparent 46%),
+        repeating-linear-gradient(
+          0deg,
+          rgba(48, 144, 74, 0.07) 0,
+          rgba(48, 144, 74, 0.07) 1px,
+          transparent 1px,
+          transparent 4px
+        ),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      display: flex;
+      justify-content: center;
+      padding: 24px;
     }
 
-    .container {
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 22px;
+    .shell {
+      width: min(1140px, 100%);
+      border: 4px solid var(--border);
+      background: var(--surface);
+      box-shadow: 12px 12px 0 var(--shadow);
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      border: 3px solid var(--border);
+      background: #0f2717;
+      padding: 12px 16px;
+      box-shadow: 5px 5px 0 #041007;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: clamp(1rem, 2vw, 1.45rem);
+      color: #d4ffbd;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--danger);
+      box-shadow: 0 0 0 2px #5f0910, 0 0 8px rgba(255, 63, 69, 0.65);
+      animation: blink 1s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      0%,
+      45% {
+        opacity: 1;
+      }
+      46%,
+      100% {
+        opacity: 0.24;
+      }
+    }
+
+    .live {
+      border: 3px solid #7d1218;
+      background: #d7282f;
+      color: #fff;
+      font-weight: 900;
+      padding: 4px 10px;
+      box-shadow: 3px 3px 0 #4f090d;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .grid {
+      margin-top: 18px;
       display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 18px;
+      grid-template-columns: 390px minmax(0, 1fr);
+      gap: 16px;
     }
 
-    .site-title {
-      grid-column: 1 / -1;
-      border: 3px solid var(--accent);
-      background: #000;
-      box-shadow: 8px 8px 0 var(--shadow);
-      padding: 14px 16px;
-    }
-
-    .site-title strong {
-      display: block;
-      font-size: 28px;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-
-    .site-title span {
-      font-size: 12px;
-      opacity: .9;
-      text-transform: uppercase;
+    .grid > .panel {
+      min-width: 0;
     }
 
     .panel {
-      background: var(--panel);
-      border: 3px solid var(--accent);
-      box-shadow: 8px 8px 0 var(--shadow);
-      padding: 16px;
+      border: 3px solid var(--border);
+      background: var(--surface-2);
+      box-shadow: 6px 6px 0 #06160b;
+      padding: 12px;
     }
 
-    h1 {
-      margin: 0 0 14px;
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
       text-transform: uppercase;
-      font-size: 24px;
-      letter-spacing: 0.02em;
+      border-bottom: 2px dashed #3f9d4f;
+      padding-bottom: 8px;
+      color: #d3ffc0;
     }
 
-    .controls {
+    .field {
+      margin-bottom: 12px;
       display: grid;
-      gap: 12px;
+      gap: 6px;
     }
 
     label {
-      font-size: 12px;
+      font-size: 0.84rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: .06em;
-      display: block;
-      margin-bottom: 4px;
+      color: var(--ink-soft);
     }
 
-    .field, textarea, select, input[type="color"], input[type="file"], button {
+    textarea,
+    input[type="number"],
+    input[type="file"],
+    select {
       width: 100%;
-      border: 2px solid var(--accent);
-      background: var(--panel-2);
-      color: var(--text);
-      padding: 10px;
+      border: 3px solid var(--border);
+      background: #071109;
+      color: #ccffb8;
       font: inherit;
+      padding: 8px;
       outline: none;
     }
 
-    textarea { min-height: 160px; resize: vertical; }
+    textarea:focus,
+    input[type="number"]:focus,
+    input[type="file"]:focus,
+    select:focus {
+      border-color: #45be56;
+      box-shadow: 0 0 0 2px rgba(69, 190, 86, 0.25);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 86px;
+    }
 
     .row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
+    }
+
+    .slider-pack {
+      display: grid;
+      grid-template-columns: 94px 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .neo-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 12px;
+      background: linear-gradient(90deg, #0a170e, #12331b);
+      border: 2px solid var(--border);
+      box-shadow: inset 0 0 0 1px #0a1a0e;
+    }
+
+    .neo-slider:focus-visible {
+      outline: 2px solid #65e177;
+      outline-offset: 2px;
+    }
+
+    .neo-slider::-webkit-slider-runnable-track {
+      height: 12px;
+      background: linear-gradient(90deg, #0a170e, #12331b);
+      border: 2px solid var(--border);
+      box-shadow: inset 0 0 0 1px #0a1a0e;
+    }
+
+    .neo-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #b8ff9b;
+      background: #1ea43a;
+      box-shadow: 2px 2px 0 #071109;
+      cursor: pointer;
+    }
+
+    .neo-slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #b8ff9b;
+      background: #1ea43a;
+      box-shadow: 2px 2px 0 #071109;
+      cursor: pointer;
+    }
+
+    .neo-slider::-moz-range-track {
+      height: 12px;
+      background: linear-gradient(90deg, #0a170e, #12331b);
+      border: 2px solid var(--border);
+      box-shadow: inset 0 0 0 1px #0a1a0e;
+    }
+
+    .neo-slider::-moz-range-progress {
+      height: 12px;
+      background: linear-gradient(90deg, #1d7f33, #27a542);
+      border: 2px solid #2f7f3a;
+    }
+
+    .switch-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .md3-switch {
+      position: relative;
+      width: 52px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .md3-switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .md3-track {
+      width: 52px;
+      height: 32px;
+      border-radius: 999px;
+      border: 2px solid #4da55b;
+      background: #0a160d;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s ease, border-color 0.2s ease;
+      padding: 2px;
+    }
+
+    .md3-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: #72d779;
+      border: 2px solid #142f18;
+      transform: translateX(0);
+      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: 2px 2px 0 #081109;
+    }
+
+    .md3-switch input:checked + .md3-track {
+      background: #1d7f33;
+      border-color: #8ffd99;
+    }
+
+    .md3-switch input:checked + .md3-track .md3-thumb {
+      transform: translateX(20px);
+      background: #d4ffd1;
     }
 
     .btns {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
 
     button {
-      cursor: pointer;
-      font-weight: 700;
+      border: 3px solid var(--border);
+      padding: 10px;
+      font: inherit;
+      font-weight: 900;
       text-transform: uppercase;
-      transition: transform .07s ease;
+      cursor: pointer;
+      background: #17361f;
+      color: #d1ffc2;
+      box-shadow: 4px 4px 0 #07110a;
+      transition: transform 80ms ease;
     }
 
-    button:hover { transform: translate(-2px, -2px); }
-    button:active { transform: translate(1px, 1px); }
-
-    .warn { color: var(--danger); min-height: 20px; font-size: 13px; }
-
-    .output-wrap {
-      display: grid;
-      gap: 10px;
+    button:hover {
+      transform: translate(-1px, -1px);
     }
 
-    #asciiOutput {
+    button:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 #07110a;
+    }
+
+    .primary {
+      background: var(--accent-2);
+    }
+
+    .screen {
+      border: 3px solid var(--border);
+      background: #040b05;
+      color: #8eff66;
+      width: 100%;
+      max-width: 100%;
+      min-height: 560px;
+      max-height: 70vh;
+      padding: 12px;
+      overflow-x: scroll;
+      overflow-y: auto;
+      box-shadow: inset 0 0 0 3px #0e2515;
+      scrollbar-width: thin;
+      scrollbar-color: #2d7f3b #071109;
+    }
+
+    .screen::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    .screen::-webkit-scrollbar-track {
+      background: #071109;
+      border-left: 2px solid #103019;
+    }
+
+    .screen::-webkit-scrollbar-thumb {
+      background: #1f8634;
+      border: 2px solid #0c2012;
+    }
+
+    pre {
       margin: 0;
-      overflow: auto;
-      min-height: 720px;
-      max-height: 82vh;
-      padding: 16px;
-      border: 3px solid var(--accent);
-      background: #000;
-      box-shadow: inset 0 0 0 2px #000;
-      line-height: 1;
+      display: inline-block;
+      min-width: 100%;
+      width: max-content;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 8px;
+      line-height: 8px;
       letter-spacing: 0;
       white-space: pre;
-      font-size: 12px;
-      color: var(--ascii-color);
     }
 
-    .help {
-      font-size: 12px;
-      opacity: .9;
+    .foot {
+      margin-top: 12px;
+      border: 3px solid var(--border);
+      background: #0b1e11;
+      box-shadow: 4px 4px 0 #06120a;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #9df093;
     }
 
-    .switch {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      border: 2px solid var(--accent);
-      padding: 8px;
-      background: var(--panel-2);
+    .hint {
+      font-size: 0.76rem;
+      opacity: 0.9;
+      color: #8fdd87;
     }
 
-    @media (max-width: 1020px) {
-      .container { grid-template-columns: 1fr; }
-      #asciiOutput { min-height: 500px; }
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .screen {
+        min-height: 420px;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="container">
-    <header class="site-title">
-      <strong>NEO ASCII LAB</strong>
-      <span>Конвертер текста и изображений в ASCIL / ASCII ART</span>
+  <main class="shell">
+    <header class="header">
+      <div class="brand">
+        <span class="dot" aria-hidden="true"></span>
+        <span>ASCIL-ART STUDIO</span>
+      </div>
+      <div class="live">LIVE</div>
     </header>
 
-    <section class="panel">
-      <h1>ASCII / ASCIL ART Конвертер</h1>
-      <div class="controls">
-        <div>
-          <label for="textInput">Текст для конвертации</label>
-          <textarea id="textInput" placeholder="Введи текст...">ASCII ART</textarea>
+    <section class="grid">
+      <aside class="panel">
+        <h2>Входные данные</h2>
+
+        <div class="field">
+          <label for="mode">Режим конвертации</label>
+          <select id="mode">
+            <option value="text">Текст -> ASCIL-ART</option>
+            <option value="image">Изображение -> ASCIL-ART</option>
+          </select>
         </div>
 
-        <div>
-          <label for="imageInput">Изображение (jpeg, png, webp)</label>
-          <input id="imageInput" type="file" accept="image/jpeg,image/png,image/webp" />
-        </div>
+        <div id="textFields">
+          <div class="field">
+            <label for="textInput">Исходный текст</label>
+            <textarea id="textInput" placeholder="Например: HELLO, WORLD!">HELLO, WORLD!</textarea>
+          </div>
 
-        <div class="row">
-          <div>
-            <label for="mode">Режим ASCII</label>
-            <select id="mode">
-              <option value="detailed">Детальный (все символы)</option>
-              <option value="standard" selected>Стандартный (10 символов)</option>
-              <option value="blocks">Блочный (из блоков)</option>
-              <option value="binary">Бинарный (0 и 1)</option>
-            </select>
+          <div class="field">
+            <label for="fontSize">Размер шрифта</label>
+            <div class="slider-pack">
+              <input id="fontSize" type="number" min="12" max="200" value="70" />
+              <input id="fontSizeRange" class="neo-slider" type="range" min="12" max="200" value="70" />
+            </div>
           </div>
-          <div>
-            <label for="asciiColor">Цвет ASCII</label>
-            <input id="asciiColor" type="color" value="#8effb7" />
-          </div>
-        </div>
 
-        <div class="row">
-          <div>
-            <label for="width">Ширина в символах</label>
-            <input id="width" class="field" type="number" min="20" max="250" value="120" />
-          </div>
-          <div>
-            <label for="fontSize">Размер символов (px)</label>
-            <input id="fontSize" class="field" type="number" min="8" max="24" value="12" />
+          <div class="field">
+            <label for="textWidth">Ширина (симв.)</label>
+            <div class="slider-pack">
+              <input id="textWidth" type="number" min="20" max="260" value="120" />
+              <input id="textWidthRange" class="neo-slider" type="range" min="20" max="260" value="120" />
+            </div>
           </div>
         </div>
 
-        <label class="switch">
-          <input id="colorized" type="checkbox" />
-          Цветной ASCII-ART (цвет каждого символа как у картинки)
-        </label>
+        <div id="imageFields" style="display:none;">
+          <div class="field">
+            <label for="imageInput">Загрузить изображение</label>
+            <input id="imageInput" type="file" accept="image/*" />
+          </div>
+
+          <div class="field">
+            <label for="imgWidth">Ширина (симв.)</label>
+            <div class="slider-pack">
+              <input id="imgWidth" type="number" min="20" max="260" value="120" />
+              <input id="imgWidthRange" class="neo-slider" type="range" min="20" max="260" value="120" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="density">Плотность символов</label>
+          <select id="density">
+            <option value="$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ">Высокая</option>
+            <option value="@#S%?*+;:,. " selected>Средняя</option>
+            <option value="#WMBRXVYIti+=;:,. ">Низкая</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <div class="switch-line">
+            <label for="invertToggle">Инверсия градации</label>
+            <label class="md3-switch" for="invertToggle">
+              <input id="invertToggle" type="checkbox" />
+              <span class="md3-track"><span class="md3-thumb"></span></span>
+            </label>
+          </div>
+          <div class="hint">Выключено = обычный, включено = инвертированный</div>
+        </div>
 
         <div class="btns">
-          <button id="renderTextBtn" type="button">Сделать из текста</button>
-          <button id="renderImageBtn" type="button">Сделать из картинки</button>
+          <button id="convertBtn" class="primary">Конвертировать</button>
+          <button id="copyBtn">Копировать</button>
+          <button id="downloadTxtBtn">Скачать TXT</button>
+          <button id="downloadPngBtn">Скачать PNG</button>
         </div>
-        <button id="downloadBtn" type="button">Скачать результат (.txt)</button>
-        <div class="warn" id="warning"></div>
-        <div class="help">Для цветного режима вывод генерируется через HTML-спаны, для монохромного — обычный текст.</div>
-      </div>
+      </aside>
+
+      <section class="panel">
+        <h2>Результат ASCIL-ART</h2>
+        <div class="screen"><pre id="output"></pre></div>
+      </section>
     </section>
 
-    <section class="panel output-wrap">
-      <label>Результат</label>
-      <pre id="asciiOutput"></pre>
-    </section>
+    <footer class="foot">terminal green mode // realtime converter // text + image</footer>
   </main>
 
+  <canvas id="workCanvas" style="display:none;"></canvas>
+
   <script>
-    const ramps = {
-      detailed: " .'`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$",
-      standard: "@%#*+=-:. ",
-      blocks: "█▓▒░ ",
-      binary: "10"
-    };
+    const mode = document.getElementById("mode");
+    const textFields = document.getElementById("textFields");
+    const imageFields = document.getElementById("imageFields");
 
-    const textInput = document.getElementById('textInput');
-    const imageInput = document.getElementById('imageInput');
-    const modeSelect = document.getElementById('mode');
-    const asciiColorInput = document.getElementById('asciiColor');
-    const widthInput = document.getElementById('width');
-    const fontSizeInput = document.getElementById('fontSize');
-    const colorizedCheckbox = document.getElementById('colorized');
-    const output = document.getElementById('asciiOutput');
-    const warning = document.getElementById('warning');
+    const textInput = document.getElementById("textInput");
+    const imageInput = document.getElementById("imageInput");
 
-    document.getElementById('renderTextBtn').addEventListener('click', renderFromText);
-    document.getElementById('renderImageBtn').addEventListener('click', renderFromImage);
-    document.getElementById('downloadBtn').addEventListener('click', downloadAscii);
-    asciiColorInput.addEventListener('input', () => {
-      output.style.color = asciiColorInput.value;
-      document.documentElement.style.setProperty('--ascii-color', asciiColorInput.value);
-    });
-    fontSizeInput.addEventListener('input', () => {
-      output.style.fontSize = `${Math.max(8, Number(fontSizeInput.value) || 12)}px`;
-    });
+    const fontSize = document.getElementById("fontSize");
+    const fontSizeRange = document.getElementById("fontSizeRange");
+    const textWidth = document.getElementById("textWidth");
+    const textWidthRange = document.getElementById("textWidthRange");
+    const imgWidth = document.getElementById("imgWidth");
+    const imgWidthRange = document.getElementById("imgWidthRange");
 
-    output.style.color = asciiColorInput.value;
+    const density = document.getElementById("density");
+    const invertToggle = document.getElementById("invertToggle");
 
-    function setWarn(msg = '') { warning.textContent = msg; }
+    const convertBtn = document.getElementById("convertBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const downloadTxtBtn = document.getElementById("downloadTxtBtn");
+    const downloadPngBtn = document.getElementById("downloadPngBtn");
 
-    function mapBrightnessToChar(brightness, ramp) {
-      const i = Math.floor((brightness / 255) * (ramp.length - 1));
-      return ramp[ramp.length - 1 - i] || ' ';
-    }
+    const output = document.getElementById("output");
+    const canvas = document.getElementById("workCanvas");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-    function renderFromText() {
-      setWarn('');
-      const text = textInput.value.trim();
-      if (!text) {
-        setWarn('Введите текст для конвертации.');
-        return;
-      }
-      const ramp = ramps[modeSelect.value];
-      const targetWidth = Math.min(250, Math.max(20, Number(widthInput.value) || 120));
-      const lines = text.split('\n');
-      const longest = lines.reduce((max, line) => Math.max(max, line.length), 1);
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const fontPx = Math.max(28, Math.round((targetWidth / Math.max(8, longest)) * 3.1));
+    let loadedImage = null;
 
-      ctx.font = `900 ${fontPx}px "IBM Plex Mono", monospace`;
-      const metrics = ctx.measureText('W');
-      const glyphWidth = Math.max(10, metrics.width);
-      const textWidth = Math.max(80, Math.ceil(longest * glyphWidth + 20));
-      const lineHeight = Math.ceil(fontPx * 1.2);
-      const textHeight = Math.max(lineHeight, lines.length * lineHeight + 20);
-
-      canvas.width = textWidth;
-      canvas.height = textHeight;
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#fff';
-      ctx.font = `900 ${fontPx}px "IBM Plex Mono", monospace`;
-      ctx.textBaseline = 'top';
-
-      lines.forEach((line, idx) => {
-        ctx.fillText(line, 10, 10 + idx * lineHeight);
+    function bindRangeNumber(rangeEl, numberEl) {
+      rangeEl.addEventListener("input", () => {
+        numberEl.value = rangeEl.value;
+        if (mode.value === "text" || loadedImage) generate();
       });
 
-      const sampleH = Math.max(10, Math.round((canvas.height / canvas.width) * targetWidth * 0.55));
-      const sampleCanvas = document.createElement('canvas');
-      const sampleCtx = sampleCanvas.getContext('2d');
-      sampleCanvas.width = targetWidth;
-      sampleCanvas.height = sampleH;
-      sampleCtx.drawImage(canvas, 0, 0, targetWidth, sampleH);
-
-      const { data } = sampleCtx.getImageData(0, 0, targetWidth, sampleH);
-      let ascii = '';
-      for (let y = 0; y < sampleH; y++) {
-        for (let x = 0; x < targetWidth; x++) {
-          const i = (y * targetWidth + x) * 4;
-          const r = data[i], g = data[i + 1], b = data[i + 2];
-          const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-          ascii += mapBrightnessToChar(brightness, ramp);
+      numberEl.addEventListener("input", () => {
+        const v = Number(numberEl.value);
+        if (Number.isFinite(v)) {
+          const min = Number(numberEl.min || rangeEl.min || 0);
+          const max = Number(numberEl.max || rangeEl.max || 1000);
+          const clamped = Math.min(max, Math.max(min, v));
+          numberEl.value = String(clamped);
+          rangeEl.value = String(clamped);
+          if (mode.value === "text" || loadedImage) generate();
         }
-        ascii += '\n';
-      }
-
-      output.textContent = ascii;
-      output.style.color = asciiColorInput.value;
+      });
     }
 
-    async function renderFromImage() {
-      setWarn('');
-      const file = imageInput.files?.[0];
+    bindRangeNumber(fontSizeRange, fontSize);
+    bindRangeNumber(textWidthRange, textWidth);
+    bindRangeNumber(imgWidthRange, imgWidth);
+
+    mode.addEventListener("change", () => {
+      const isText = mode.value === "text";
+      textFields.style.display = isText ? "block" : "none";
+      imageFields.style.display = isText ? "none" : "block";
+      generate();
+    });
+
+    imageInput.addEventListener("change", (event) => {
+      const file = event.target.files?.[0];
       if (!file) {
-        setWarn('Выберите изображение в формате jpeg, png или webp.');
+        loadedImage = null;
+        generate();
         return;
       }
 
-      const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-      if (!allowed.includes(file.type)) {
-        setWarn('Недопустимый тип файла. Поддерживаются только jpeg, png, webp.');
-        return;
-      }
-
-      const img = await loadImage(file);
-      const targetWidth = Math.min(250, Math.max(20, Number(widthInput.value) || 120));
-      const scale = img.height / img.width;
-      const targetHeight = Math.max(10, Math.round(targetWidth * scale * 0.55));
-
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-
-      const { data } = ctx.getImageData(0, 0, targetWidth, targetHeight);
-      const ramp = ramps[modeSelect.value];
-      const colorized = colorizedCheckbox.checked;
-
-      if (!colorized) {
-        let ascii = '';
-        for (let y = 0; y < targetHeight; y++) {
-          for (let x = 0; x < targetWidth; x++) {
-            const i = (y * targetWidth + x) * 4;
-            const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-            if (a < 40) {
-              ascii += ' ';
-              continue;
-            }
-            const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-            ascii += mapBrightnessToChar(brightness, ramp);
-          }
-          ascii += '\n';
-        }
-        output.textContent = ascii;
-        output.style.color = asciiColorInput.value;
-      } else {
-        let html = '';
-        for (let y = 0; y < targetHeight; y++) {
-          for (let x = 0; x < targetWidth; x++) {
-            const i = (y * targetWidth + x) * 4;
-            const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-            const brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-            const char = a < 40 ? ' ' : mapBrightnessToChar(brightness, ramp);
-            html += `<span style="color: rgb(${r},${g},${b});">${escapeHtml(char)}</span>`;
-          }
-          html += '\n';
-        }
-        output.innerHTML = html;
-      }
-    }
-
-    function loadImage(file) {
-      return new Promise((resolve, reject) => {
-        const url = URL.createObjectURL(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          URL.revokeObjectURL(url);
-          resolve(img);
+          loadedImage = img;
+          if (mode.value === "image") generate();
         };
-        img.onerror = reject;
-        img.src = url;
-      });
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function brightnessToChar(brightness, charset, useInvert) {
+      const normalized = brightness / 255;
+      const value = useInvert ? normalized : 1 - normalized;
+      const idx = Math.max(0, Math.min(charset.length - 1, Math.floor(value * (charset.length - 1))));
+      return charset[idx];
     }
 
-    function escapeHtml(char) {
-      return char
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;')
-        .replaceAll(' ', '&nbsp;');
-    }
-
-    function downloadAscii() {
-      const content = output.innerText || '';
-      if (!content.trim()) {
-        setWarn('Сначала создайте ASCII-ART, затем скачивайте.');
-        return;
+    function pixelsToAscii(width, height, imageData, charset, useInvert) {
+      const lines = [];
+      for (let y = 0; y < height; y++) {
+        let line = "";
+        for (let x = 0; x < width; x++) {
+          const i = (y * width + x) * 4;
+          const r = imageData[i];
+          const g = imageData[i + 1];
+          const b = imageData[i + 2];
+          const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          line += brightnessToChar(luminance, charset, useInvert);
+        }
+        lines.push(line);
       }
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      return lines.join("\n");
+    }
+
+    function renderTextToAscii() {
+      const content = textInput.value || " ";
+      const charWidth = Math.max(20, Number(textWidth.value) || 120);
+      const size = Math.max(12, Number(fontSize.value) || 70);
+
+      canvas.width = charWidth;
+      canvas.height = Math.max(20, Math.floor(size * 1.5));
+
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "black";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+      ctx.font = "900 " + size + "px monospace";
+      ctx.fillText(content, canvas.width / 2, Math.floor(canvas.height / 2));
+
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      return pixelsToAscii(canvas.width, canvas.height, data, density.value, invertToggle.checked);
+    }
+
+    function renderImageToAscii() {
+      if (!loadedImage) {
+        return "[ Загрузите изображение, чтобы конвертировать его в ASCIL-ART ]";
+      }
+
+      const targetWidth = Math.max(20, Number(imgWidth.value) || 120);
+      const sourceRatio = loadedImage.height / loadedImage.width;
+      const targetHeight = Math.max(12, Math.floor(targetWidth * sourceRatio * 0.55));
+
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      ctx.drawImage(loadedImage, 0, 0, targetWidth, targetHeight);
+
+      const data = ctx.getImageData(0, 0, targetWidth, targetHeight).data;
+      return pixelsToAscii(targetWidth, targetHeight, data, density.value, invertToggle.checked);
+    }
+
+    function generate() {
+      output.textContent = mode.value === "text" ? renderTextToAscii() : renderImageToAscii();
+    }
+
+    function downloadTextFile() {
+      const text = output.textContent || "";
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `ascii-art-${Date.now()}.txt`;
+      a.download = "ascil-art.txt";
       a.click();
       URL.revokeObjectURL(url);
     }
 
-    renderFromText();
+    function downloadPngFile() {
+      const text = output.textContent || "";
+      const lines = text.split("\n");
+      const maxLineLength = lines.reduce((max, line) => Math.max(max, line.length), 0);
+
+      const exportCanvas = document.createElement("canvas");
+      const exCtx = exportCanvas.getContext("2d");
+
+      const fontSizePx = 12;
+      const lineHeight = 14;
+      exCtx.font = fontSizePx + "px Consolas, monospace";
+      const charWidth = Math.ceil(exCtx.measureText("M").width);
+
+      const padding = 18;
+      exportCanvas.width = Math.max(320, maxLineLength * charWidth + padding * 2);
+      exportCanvas.height = Math.max(180, lines.length * lineHeight + padding * 2);
+
+      exCtx.fillStyle = "#040b05";
+      exCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+      exCtx.fillStyle = "#8eff66";
+      exCtx.font = fontSizePx + "px Consolas, monospace";
+      exCtx.textBaseline = "top";
+
+      lines.forEach((line, i) => {
+        exCtx.fillText(line, padding, padding + i * lineHeight);
+      });
+
+      const url = exportCanvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ascil-art.png";
+      a.click();
+    }
+
+    convertBtn.addEventListener("click", generate);
+
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(output.textContent);
+        copyBtn.textContent = "Скопировано";
+        setTimeout(() => {
+          copyBtn.textContent = "Копировать";
+        }, 1200);
+      } catch {
+        copyBtn.textContent = "Ошибка";
+        setTimeout(() => {
+          copyBtn.textContent = "Копировать";
+        }, 1200);
+      }
+    });
+
+    downloadTxtBtn.addEventListener("click", downloadTextFile);
+    downloadPngBtn.addEventListener("click", downloadPngFile);
+
+    [textInput, density].forEach((el) => {
+      el.addEventListener("input", () => {
+        if (mode.value === "text" || loadedImage) generate();
+      });
+    });
+
+    invertToggle.addEventListener("change", () => {
+      if (mode.value === "text" || loadedImage) generate();
+    });
+
+    generate();
   </script>
 </body>
 </html>
