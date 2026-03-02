@@ -181,6 +181,73 @@
       outline: none;
     }
 
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .file-picker {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .visually-hidden-file {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      clip: rect(0 0 0 0);
+      overflow: hidden;
+    }
+
+    .file-trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid var(--border);
+      background: #17361f;
+      color: #d1ffc2;
+      font: inherit;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 8px 10px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #07110a;
+      user-select: none;
+    }
+
+    .file-trigger:hover {
+      background: #1d4a29;
+    }
+
+    .visually-hidden-file:focus + .file-trigger {
+      outline: 2px solid #65e177;
+      outline-offset: 2px;
+    }
+
+    .file-name {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      border: 3px solid var(--border);
+      background: #071109;
+      color: #ccffb8;
+      padding: 8px 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     textarea:focus,
     input[type="number"]:focus,
     input[type="file"]:focus,
@@ -202,9 +269,72 @@
 
     .slider-pack {
       display: grid;
-      grid-template-columns: 94px 1fr;
+      grid-template-columns: 110px 1fr;
       gap: 8px;
       align-items: center;
+    }
+
+    .num-wrap {
+      display: grid;
+      grid-template-columns: 1fr 22px;
+      border: 3px solid var(--border);
+      background: #071109;
+      height: 40px;
+      overflow: hidden;
+    }
+
+    .num-wrap input[type="number"] {
+      border: 0;
+      height: 100%;
+      padding: 8px;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .num-wrap input[type="number"]:focus {
+      box-shadow: none;
+      border-color: transparent;
+    }
+
+    .num-stepper {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      border-left: 2px solid var(--border);
+      background: #102515;
+    }
+
+    .num-step-btn {
+      border: 0;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      line-height: 1;
+      font-size: 10px;
+      font-weight: 900;
+      color: #d1ffc2;
+      background: #17361f;
+      box-shadow: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .num-step-btn + .num-step-btn {
+      border-top: 1px solid var(--border);
+    }
+
+    .num-step-btn:hover {
+      background: #1d4a29;
+      transform: none;
+    }
+
+    .num-step-btn:active {
+      background: #246433;
+      transform: none;
+      box-shadow: none;
     }
 
     .neo-slider {
@@ -468,7 +598,11 @@
         <div id="imageFields" style="display:none;">
           <div class="field">
             <label for="imageInput">Загрузить изображение</label>
-            <input id="imageInput" type="file" accept="image/*" />
+            <div class="file-picker">
+              <input id="imageInput" class="visually-hidden-file" type="file" accept="image/*" />
+              <label for="imageInput" class="file-trigger">Загрузить</label>
+              <span id="fileName" class="file-name">Файл не выбран</span>
+            </div>
           </div>
 
           <div class="field">
@@ -526,6 +660,7 @@
 
     const textInput = document.getElementById("textInput");
     const imageInput = document.getElementById("imageInput");
+    const fileName = document.getElementById("fileName");
 
     const fontSize = document.getElementById("fontSize");
     const fontSizeRange = document.getElementById("fontSizeRange");
@@ -547,6 +682,48 @@
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
     let loadedImage = null;
+
+    function attachCustomNumberSteppers() {
+      const numberInputs = document.querySelectorAll(".slider-pack input[type='number']");
+      numberInputs.forEach((input) => {
+        if (input.parentElement && input.parentElement.classList.contains("num-wrap")) return;
+
+        const wrap = document.createElement("div");
+        wrap.className = "num-wrap";
+
+        const stepper = document.createElement("div");
+        stepper.className = "num-stepper";
+
+        const up = document.createElement("button");
+        up.type = "button";
+        up.className = "num-step-btn";
+        up.textContent = "▲";
+
+        const down = document.createElement("button");
+        down.type = "button";
+        down.className = "num-step-btn";
+        down.textContent = "▼";
+
+        const host = input.parentElement;
+        host.insertBefore(wrap, input);
+        wrap.appendChild(input);
+        stepper.appendChild(up);
+        stepper.appendChild(down);
+        wrap.appendChild(stepper);
+
+        up.addEventListener("click", () => {
+          input.stepUp();
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+
+        down.addEventListener("click", () => {
+          input.stepDown();
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+      });
+    }
+
+    attachCustomNumberSteppers();
 
     function bindRangeNumber(rangeEl, numberEl) {
       rangeEl.addEventListener("input", () => {
@@ -582,9 +759,11 @@
       const file = event.target.files?.[0];
       if (!file) {
         loadedImage = null;
+        fileName.textContent = "Файл не выбран";
         generate();
         return;
       }
+      fileName.textContent = file.name;
 
       const reader = new FileReader();
       reader.onload = (e) => {
