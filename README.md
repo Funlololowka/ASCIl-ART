@@ -22,3 +22,5 @@ python3 -m http.server 8000
 ```
 
 После этого откройте `http://localhost:8000`.
+
+Или же зайдите на сайт: https://ascil-art-production.up.railway.app/
